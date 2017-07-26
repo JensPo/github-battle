@@ -1,14 +1,40 @@
 var React = require('react');
+var PropTypes = require('prop-types');
 
+//stateless functional component
+function SelectLanguage (props) {
+    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+
+    return (
+      <ul className='languages'>
+        {languages.map(function (lang) {
+          return (
+            <li
+              style={lang === props.selectedLanguage ? {color: '#d0021b'} : null}
+              onClick={props.onSelect.bind(null, lang)}
+              key={lang}>
+                {lang}
+            </li>
+          )
+        })}
+      </ul>
+    )
+}
+
+SelectLanguage.propTypes = {
+  selectedLanguage: PropTypes.string.isRequired,
+  onSelect: PropTypes.func.isRequired,
+}
+
+// Popular component
 class Popular extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       selectedLanguage: 'All',
     };
-
     //binding the this keyword in updatelanguage function so -
-    // it would always be the compnent instance itself
+    // it would always be the compnent instance itself (Popular)
     this.updateLanguage = this.updateLanguage.bind(this);
   }
   updateLanguage(lang) {
@@ -19,22 +45,12 @@ class Popular extends React.Component {
     });
   }
   render() {
-    var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
-
     return (
       <div>
-        <ul className='languages'>
-          {languages.map(function (lang) {
-            return (
-              <li
-                style={lang === this.state.selectedLanguage ? {color: '#d0021b'} : null}
-                onClick={this.updateLanguage.bind(null, lang)}
-                key={lang}>
-                  {lang}
-              </li>
-            )
-          }, this)}
-        </ul>
+        <SelectLanguage
+          selectedLanguage={this.state.selectedLanguage}
+          onSelect={this.updateLanguage}
+        />
       </div>
     )
   }
