@@ -1,5 +1,32 @@
 var React = require('react');
 var PropTypes = require('prop-types');
+var api = require('../utils/api');
+
+
+function RepoGrid(props) {
+  return (
+    <ul className="popular-list">
+      {props.repos.map(function (repo, index) {
+        return(
+          <li key={repo.name} className="popular-item">
+            <div className="popular-rank">#{index +1}</div>
+            <ul className="space-list-items">
+              <li><img className="avatar" src={repo.owner.avatar_url} alt={"avatar for"+ repo.owner.login } /></li>
+              <li><a href={repo.html_url}>{repo.name}</a></li>
+              <li>@{repo.owner.login}</li>
+              <li>{repo.stargazers_count} stars</li>
+            </ul>//
+          </li>
+        )
+      })}
+    </ul>
+  )
+}
+
+
+RepoGrid.propTypes = {
+  repos: PropTypes.array.isRequired,
+}
 
 //stateless functional component
 function SelectLanguage (props) {
@@ -26,23 +53,42 @@ SelectLanguage.propTypes = {
   onSelect: PropTypes.func.isRequired,
 }
 
+
+
 // Popular component
 class Popular extends React.Component {
   constructor(props) {
     super(props);
+    //initial state of the component
     this.state = {
       selectedLanguage: 'All',
+      repos: null
     };
     //binding the this keyword in updatelanguage function so -
     // it would always be the compnent instance itself (Popular)
     this.updateLanguage = this.updateLanguage.bind(this);
   }
+  //lifecycle event
+  componentDidMount() {
+    this.updateLanguage(this.state.selectedLanguage)
+  }
   updateLanguage(lang) {
     this.setState(function () {
       return {
         selectedLanguage: lang,
+        //reset repos to null
+        repos: null
       }
     });
+
+    api.fetchPopularRepos(lang)
+    .then(function(repos) {
+        this.setState(function() {
+          return {
+            repos: repos
+          }
+        })
+      }.bind(this));
   }
   render() {
     return (
@@ -51,7 +97,11 @@ class Popular extends React.Component {
           selectedLanguage={this.state.selectedLanguage}
           onSelect={this.updateLanguage}
         />
+        {!this.state.repos
+          ? <p className="loading">LOADING</p>
+          : <RepoGrid repos={this.state.repos}/>}
       </div>
+
     )
   }
 }
