@@ -3,7 +3,10 @@ var React = require('react'),
     ReactRouter = require('react-router-dom'),
     Router = ReactRouter.BrowserRouter,
     Route = ReactRouter.Route,
-    Nav = require('./Nav');
+    Switch = ReactRouter.Switch,
+    Nav = require('./Nav'),
+    Home = require('./Home'),
+    Battle = require('./Battle');
 
 class App extends React.Component {
   render() {
@@ -11,7 +14,14 @@ class App extends React.Component {
       <Router>
         <div className = 'container'>
           <Nav />
-          <Route path='/popular' component={Popular} />
+          <Switch>
+            <Route exact path='/' component={Home} />
+            <Route path='/popular' component={Popular} />
+            <Route exact path='/battle' component={Battle} />
+            <Route render={function() {
+              return <p>Sorry! That page does not exist</p>
+            }}/>
+          </Switch>
         </div>
       </Router>
     )
